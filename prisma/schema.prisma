@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output = "./erd.svg"
+}
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Cargo {
+  id_cargo       Int            @id @default(autoincrement())
+  nm_cargo       String         
+  funcionarios   Funcionario[]
+}
+
+model FormaEntrega {
+  id_forma_entrega Int         @id @default(autoincrement())
+  nm_forma_entrega String      
+  pedidos          Pedido[]
+}
+
+model Funcionario {
+  id_funcionario Int      @id @default(autoincrement())
+  nm_funcionario String   
+  nr_cpf         String   
+  dt_inicio      DateTime
+  dt_fim         DateTime?
+  id_cargo       Int
+  cargo          Cargo    @relation(fields: [id_cargo], references: [id_cargo])
+}
+
+model Prato {
+  id_prato     Int     @id @default(autoincrement())
+  nm_prato     String  
+  ds_prato     String? 
+  vl_prato     Float
+  pedidos      Pedido[]
+}
+
+model Bebida {
+  id_bebida    Int     @id @default(autoincrement())
+  nm_bebida    String  
+  ds_bebida    String? 
+  vl_bebida    Float
+  pedidos      Pedido[]
+}
+
+model FormaPagamento {
+  id_forma_pagamento  Int      @id @default(autoincrement())
+  nm_forma_pagamento  String   
+  pedidos             Pedido[]
+}
+
+model Endereco {
+  id_endereco  Int      @id @default(autoincrement())
+  logradouro   String   
+  numero       String?  
+  bairro       String?  
+  cep          String?  
+  pedidos      Pedido[]
+}
+
+model Pedido {
+  id_pedido          Int            @id @default(autoincrement())
+  dt_pedido          DateTime
+  id_forma_pagamento Int
+  id_prato           Int?
+  id_bebida          Int?
+  id_forma_entrega   Int
+  id_endereco        Int?
+  
+  formaPagamento     FormaPagamento @relation(fields: [id_forma_pagamento], references: [id_forma_pagamento])
+  prato              Prato?         @relation(fields: [id_prato], references: [id_prato])
+  bebida             Bebida?        @relation(fields: [id_bebida], references: [id_bebida])
+  formaEntrega       FormaEntrega   @relation(fields: [id_forma_entrega], references: [id_forma_entrega])
+  endereco           Endereco?      @relation(fields: [id_endereco], references: [id_endereco])
+}
